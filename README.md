@@ -1,105 +1,59 @@
 ...existing code...
-# 🛡️ Detection & Alert Generation — Quick Start & Guide
+# Crypto-Ransomware — Research & Detection Playground 🛡️🧪
 
-A compact GUI + watcher that protects honeyfiles and triggers multi-channel alerts (desktop popup, email, SMS, voice) when a monitored file is accessed. Built for easy setup and safe secret handling.
+A dual-purpose cybersecurity experiment: a safe, educational simulation that demonstrates ransomware behaviors for research and builds defensive tooling (honeyfiles, file-watchers, multi-channel alerts). This repository is for learning, detection testing, and red-team / blue-team exercises in controlled, legal environments only.
 
-## 🚀 What this module does
-- Lets an operator pick honeyfiles to monitor via a simple GUI.
-- Uses Watchdog to observe filesystem events for selected files/folders.
-- On access/modify/move/delete events, enqueues a popup and sends email/SMS/voice alerts.
-- Keeps credentials out of source control using a local `.env` file (already ignored by .gitignore).
+> ⚠️ Important: DO NOT use this code to harm systems or data. Always run in isolated lab environments (VM/sandbox) and obtain explicit permission before testing on any network or device you do not own.
 
-## ⚙️ Quick setup (macOS)
-1. Install Python 3.8+.
-2. From the module folder:
-   ```bash
+## 🎯 Goals
+- Demonstrate how file-activity-based attacks behave at a high level (for study).
+- Provide lightweight defensive components: honeyfile selection UI, Watchdog-based monitor, and alerting (desktop, email, SMS/voice).
+- Give a safe platform to test detection logic, alerting pipelines, and incident workflows.
+
+## 🔧 Project components
+- Detection & Alert Generation — GUI + watcher that monitors honeyfiles and triggers alerts (desktop popup, email, SMS, voice).
+- Utilities — helpers for environment loading, configs, and safe sandboxing.
+- Docs & templates — .env.template and README notes for safe setup.
+
+(See the Detection & Alert Generation folder for detailed module-level docs.)
+
+## 🚀 Quickstart (safe lab)
+1. Clone the project and work inside an isolated VM or sandbox.
+2. Change to the detection module:
    cd "Ransomware Code Files/Detection & Alert Generation"
+3. Install dependencies:
    pip install -r requirement.txt
    pip install python-dotenv twilio certifi
-   ```
-3. Create credentials (see below) and run:
-   ```bash
+4. Create credentials from the template:
+   cp .env.template .env
+   Edit .env with test credentials (use test numbers/accounts).
+5. Run the monitor GUI:
    python monitor_files_GUI.py
-   ```
 
-## 🔐 Environment variables — create & use safely
-Purpose: keep secrets (Twilio, email) out of the repo. The repo already ignores /Detection & Alert Generation/.env.
+## 🔐 Environment & secrets
+- Keep real credentials out of the repo. Use .env (already ignored by .gitignore).
+- Use .env.template for sharing configuration shape without secrets.
+- For local development prefer test Twilio accounts and disposable email app passwords.
 
-- Create a `.env` (recommended) by copying the template:
-  ```bash
-  cp .env.template .env
-  open .env    # or edit with your editor
-  ```
-- Or create from terminal:
-  ```bash
-  echo "TWILIO_ACCOUNT_SID=your_sid" > .env
-  echo "TWILIO_AUTH_TOKEN=your_token" >> .env
-  echo "TWILIO_NUMBER=+1234567890" >> .env
-  echo "ALERT_TO_NUMBER=+1987654321" >> .env
-  echo "SENDER_EMAIL=you@example.com" >> .env
-  echo "RECEIVER_EMAIL=ops@example.com" >> .env
-  echo "EMAIL_APP_PASSWORD=app_password" >> .env
-  ```
+## 🧠 How it works (high level)
+- Select honeyfiles with the GUI.
+- A Watchdog observer watches folders/paths containing those files.
+- File events (access/modify/delete/move) trigger a handler that enqueues a desktop popup and attempts outbound alerts (email/Twilio).
+- The system is intended to surface suspicious access in a lab — not to encrypt or exfiltrate real data.
 
-.env.template (safe to commit)
-```text
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_NUMBER=
-ALERT_TO_NUMBER=
-SENDER_EMAIL=
-RECEIVER_EMAIL=
-EMAIL_APP_PASSWORD=
-```
+## ✅ Best practices & safety
+- Run in a VM or isolated environment. Snapshot before experiments.
+- Use throwaway accounts / test numbers for Twilio and email.
+- Log everything locally; do not transmit sensitive production files.
+- If comparing detection logic, feed synthetic/non-sensitive samples.
 
-## 🧩 Load env vars in Python
-Install the loader:
-```bash
-pip install python-dotenv
-```
-Example usage:
-```python
-from dotenv import load_dotenv
-import os
-from pathlib import Path
+## 📚 Further reading & extension ideas
+- Add integration with SIEM/log aggregation (syslog/Elastic/CloudWatch).
+- Replace live SMS with webhook mocks for automated testing.
+- Expand honeyfile types and decoy folder placement strategies.
 
-env_path = Path(__file__).parent / '.env'
-load_dotenv(env_path)             # loads .env into os.environ
+## 🤝 Contributing
+Contributions are welcome for documentation, safe-testing harnesses, and alert routing. Open a PR and describe the lab setup used for validation.
 
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
-```
-
-## 🖥️ Shell alternatives (macOS)
-- Temporary for current shell:
-  ```bash
-  export TWILIO_ACCOUNT_SID="your_sid"
-  echo $TWILIO_ACCOUNT_SID
-  ```
-- Persist (zsh):
-  Add exports to `~/.zshrc` and run:
-  ```bash
-  source ~/.zshrc
-  ```
-
-## ⚠️ Security notes
-- Never commit `.env` with real secrets. If secrets were committed, rotate them and remove from history.
-- To stop tracking a committed .env:
-  ```bash
-  git rm --cached "Detection & Alert Generation/.env"
-  git commit -m "Stop tracking .env"
-  ```
-- Ensure network access for SMTP/Twilio and desktop session for Tkinter popups.
-
-## 🧪 Quick troubleshooting
-- No popups: verify Tkinter availability and desktop session.
-- Missing events: check folder permissions and Watchdog support for the platform.
-- Alert failures: validate credentials and outbound network (SMTP/Twilio).
-
-## 🔗 Where to look
-- monitor_files_GUI.py — watcher + FileEventHandler (entrypoint)
-- gui_honeyfile_picker.py — file picker helper
-- mailAlert.py — alert queue + email/SMS/voice senders
-- requirement.txt — dependencies
-
-...existing
+## 📜 License & Ethics
+This repo is for education and defensive research. Do not repurpose code for malicious activity. Authors are not responsible for misuse. Check local laws and institutional policies
